@@ -27,18 +27,24 @@ export default store => next => action => {
         throw new Error('action type 必须为字符串类型');
     }
 
+    const actionWith = data => {
+        const finalAction = { ...action, ...data };
+        delete finalAction[FETCH_DATA];
+        return finalAction;
+    };
+
     const [requestType, successType, failureTypr] = types;
 
-    next({type: requestType});
+    next(actionWith({type: requestType}));
     return fetchData(endpoint, schema).then(
-        response => next({
+        response => next(actionWith({
             type: successType,
             response
-        }),
-        error => next({
+        })),
+        error => next(actionWith({
             type: failureTypr,
             error: error.message || '获取数据失败'
-        })
+        }))
     )
 }
 
@@ -46,7 +52,7 @@ export default store => next => action => {
 // 执行网络请求
 const fetchData = (endpoint, schema) => {
     return get(endpoint).then(data => {
-        return normalizData(data, schema);
+        return normalizeData(data, schema);
     })
 };
 

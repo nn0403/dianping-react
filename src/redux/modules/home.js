@@ -1,6 +1,7 @@
 import { get } from '../../utils/request';
 import url from '../../utils/url';
-import { FETCH_DATA } from "./entities/products";
+import { FETCH_DATA } from "../middleware/api";
+import { schema } from './entities/products'
 
 export const types = {
     // 获取猜你喜欢 请求
@@ -21,41 +22,18 @@ export const actions = {
 };
 
 
-export const actions = {
-  loadLike: () => {
-      return (dispatch, getState) => {
-          dispatch(fetchLikesRequest());
-          return get(url.getProductList(0, 10)).then(
-              data => {
-                  dispatch(fetchLikesSuccess(data));
-              },
-              error => {
-                  dispatch(fetchLikesFailure(error));
-              }
-          )
-      }
-  }
-};
-
-const  fetchLikes = endpoint => ({
+const  fetchLikes = ( endpoint ) => ({
     [FETCH_DATA]: {
-
+        types: [
+            types.FETCH_LIKES_FAILURE,
+            types.FETCH_LIKES_SUCCESS,
+            types.FETCH_LIKES_REQUEST
+        ],
+        endpoint,
+        schema
     }
 });
 
-const fetchLikesRequest = () => ({
-    type: types.FETCH_LIKES_REQUEST
-});
-
-const fetchLikesSuccess = (data) => ({
-    type: types.FETCH_LIKES_SUCCESS,
-    data
-});
-
-const fetchLikesFailure = (error) => ({
-    type: types.FETCH_LIKES_FAILURE,
-    error
-});
 
 const reducer = (state = {}, action) => {
     switch (action.type) {
